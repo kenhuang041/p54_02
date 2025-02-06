@@ -13,6 +13,9 @@ class PasswordManage extends StatefulWidget {
 class PasswordManageState extends State<PasswordManage> {
   final DatabaseHelper02 _dbHelper02 = DatabaseHelper02();
   final TextEditingController txt01 = TextEditingController();
+  final TextEditingController txt02 = TextEditingController();
+  static List<Item> lst = <Item>[];
+  bool inSearch = false;
 
   @override
   Widget build(BuildContext context) {
@@ -20,12 +23,51 @@ class PasswordManageState extends State<PasswordManage> {
       mainAxisSize: MainAxisSize.min,
 
       children: <Widget>[
+        Container(
+          height: 32,
+          width: 370,
+          //padding: EdgeInsets.only(top:1),
+          margin: EdgeInsets.only(top:5,bottom: 5),
+          alignment: Alignment.center,
+
+          child: TextField(
+            controller: txt02,
+            onChanged: (value) async {
+              if(txt02.text == ""){
+                lst = await _dbHelper02.getAllItem();
+                inSearch = false;
+                setState(() {});
+              }
+            },
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.only(top: 4,left: 15),
+              fillColor: Colors.white,
+              filled: true,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: Colors.black,width: 2),
+              ),
+
+              suffixIcon: IconButton(
+                  onPressed: () async {
+                    if(txt02.text != "") {
+                      lst =  await _dbHelper02.getItem(txt02.text);
+                      inSearch = true;
+                      setState(() {});
+                    }
+                  },
+                  icon: Icon(Icons.search),
+              )
+            ),
+          ),
+        ),
+
         Expanded(
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 15),
 
             child: FutureBuilder<List<Item>> (
-                future: _dbHelper02.getAllItem(),
+                future: inSearch ? Future.value(lst) : _dbHelper02.getAllItem(),
                 builder: (context,snapshot) {
                   if(snapshot.connectionState == ConnectionState.waiting){
                     return CircularProgressIndicator();
@@ -37,7 +79,7 @@ class PasswordManageState extends State<PasswordManage> {
                     return Text('no data');
                   }
 
-                  List<Item> lst = snapshot.data!;
+                  if(!inSearch) lst = snapshot.data!;
                   return ListView.builder(
                       itemCount: lst.length,
                       itemBuilder: (context,index) {
@@ -61,12 +103,15 @@ class PasswordManageState extends State<PasswordManage> {
 
                                 IconButton(
                                   onPressed: () async {
+                                    lst[index].favorite = lst[index].favorite == 0 ? 1 : 0;
+
                                     await _dbHelper02.updateItem(Item(
                                       id: lst[index].id,
                                       password: lst[index].password,
-                                      favorite: lst[index].favorite == 0 ? 1 : 0,
+                                      favorite: lst[index].favorite,
                                     ));
 
+                                    //if(inSearch == 1) lst.removeAt(id);
                                     setState(() {});
                                   },
                                   icon: lst[index].favorite == 0 ? Icon(Icons.favorite_border) : Icon(Icons.favorite),
@@ -151,6 +196,11 @@ class PasswordManageState extends State<PasswordManage> {
                       showSnackBar(context, '修改成功', Colors.green);
                       Navigator.pop(context);
 
+                      if(txt02.text != "") {
+                        lst =  await _dbHelper02.getItem(txt02.text);
+                        inSearch = true;
+                      }
+
                       setState(() {});
                       txt01.text = "";
                     }
@@ -170,6 +220,7 @@ class PasswordManageState extends State<PasswordManage> {
     if(id == null) print('error delete');
     else{
       await _dbHelper02.deleteItem(id);
+      lst.removeAt(id);
       setState(() {});
     }
   }

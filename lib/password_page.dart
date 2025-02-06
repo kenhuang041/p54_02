@@ -85,7 +85,8 @@ class MyState extends State<PasswordPage> {
               title: const Text("離開"),
               leading: const Icon(Icons.exit_to_app),
               onTap: () {
-                //Navigator.pop(context);
+                Navigator.pop(context);
+                Navigator.pop(context);
               },
             ),
           ],

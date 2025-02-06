@@ -172,6 +172,10 @@ E/flutter ( 5842): #2      LoginState.build.<anonymous closure> (package:untitle
 E/flutter ( 5842): <asynchronous suspension>
 E/flutter ( 5842): */
                       showSnackBar(context, str, color);
+                      txt01.text = "";
+                      txt02.text = "";
+                      txt03.text = "";
+                      txt04.text = "";
                       //clearText();
                     }
                   },

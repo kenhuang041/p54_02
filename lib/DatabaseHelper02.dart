@@ -65,8 +65,8 @@ class DatabaseHelper02 {
     Database db = await database;
     List<Map<String,dynamic>> lst = await db.query(
         'items',
-        where: 'password = ?',
-        whereArgs: [password],
+        where: 'password LIKE ?',
+        whereArgs: ["%$password%"],
     );
     return lst.map((mp) => Item.fromMap(mp)).toList();
   }
