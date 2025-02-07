@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled3/DatabaseHelper01.dart';
 import 'package:untitled3/password_page.dart';
 
+
 void main() {
   runApp(const MyApp());
 }
@@ -12,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: LoginPage(),
+      home: StartPage(),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -64,6 +65,8 @@ class LoginState extends State<LoginPage> {
   final TextEditingController txt03 = TextEditingController();
   final TextEditingController txt04 = TextEditingController();
   final DatabaseHelper _dbHelper = DatabaseHelper();
+  //bool isVisible = false;
+  bool isVisible =  false;
 
   @override
   Widget build(BuildContext context) {
@@ -133,8 +136,16 @@ class LoginState extends State<LoginPage> {
                 alignment: Alignment.topLeft,
                 child: TextField(
                   controller: txt04,
+                  obscureText: !isVisible,
                   decoration: InputDecoration(
-                    //hintText: '123...',
+                    suffixIcon: IconButton(
+                      icon: Icon(isVisible ? Icons.visibility : Icons.visibility_off),
+                      onPressed: () {
+                        setState(() {
+                          isVisible = !isVisible;
+                        });
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -147,11 +158,15 @@ class LoginState extends State<LoginPage> {
                     String str = "登入成功";
                     var color = Colors.green;
 
-                    if(txt01.text != "" && txt02.text != "" && txt03.text != "" && txt04.text != "") {
+                    //print(txt03.text.substring(txt03.text.length-10,txt03.text.length-1));
+                    if(!(txt03.text.length > 10 && txt03.text.substring(txt03.text.length-10,txt03.text.length) == "@gmail.com")){
+                      showSnackBar(context, "帳號格式錯誤", Colors.red);
+                    }
+                    else if(txt01.text != "" && txt02.text != "" && txt04.text != "") {
                       User user = await _dbHelper.getUser(User(
                         name: txt01.text,
-                        email: txt02.text,
-                        birthday: txt03.text,
+                        email: txt03.text,
+                        birthday: txt02.text,
                         password: txt04.text,
                       ));
 
@@ -161,7 +176,7 @@ class LoginState extends State<LoginPage> {
                       }
                       else{
                         print(user.name + "\n" + user.email + "\n" + user.birthday + "\n" + user.password);
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => PasswordPage()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => PasswordPage(nm: user.name,br: user.birthday,)));
                       }
                       /*I/flutter ( 5842): ken 2008/04/01 kenhuang0401@gmail.com 12345
 E/flutter ( 5842): [ERROR:flutter/runtime/dart_vm_initializer.cc(40)] Unhandled Exception: Bad state: No element
@@ -200,6 +215,7 @@ E/flutter ( 5842): */
                       const Text('沒有帳號？',style: TextStyle(fontSize: 12),),
                       TextButton(
                         onPressed: () async {
+                          FocusScope.of(context).requestFocus(FocusNode());
                           Navigator.push(context, MaterialPageRoute(builder: (context) => SigninPage()));
                         },
 
@@ -268,6 +284,7 @@ class SigninPage extends StatelessWidget {
           centerTitle: true,
           leading: IconButton(
               onPressed: () {
+                FocusScope.of(context).requestFocus(FocusNode());
                 Navigator.pop(context);
               },
               icon: Icon(Icons.arrow_back,color: Colors.white,),
@@ -346,14 +363,18 @@ class SigninPage extends StatelessWidget {
                     String str = "註冊成功";
                     var color = Colors.green;
 
-                    if(txt01.text != "" && txt02.text != "" && txt03.text != "" && txt04.text != "") {
+                    if(!(txt03.text.length > 10 && txt03.text.substring(txt03.text.length-10,txt03.text.length) == "@gmail.com")){
+                      showSnackBar(context, "帳號格式錯誤", Colors.red);
+                    }
+                    else if(txt01.text != "" && txt02.text != "" && txt04.text != "") {
                       await _dbHelper.insertUser(User(
                         name: txt01.text,
-                        email: txt02.text,
-                        birthday: txt03.text,
+                        email: txt03.text,
+                        birthday: txt02.text,
                         password: txt04.text,
                       ));
 
+                      FocusScope.of(context).requestFocus(FocusNode());
                       Navigator.pop(context);
                     }
                     else {

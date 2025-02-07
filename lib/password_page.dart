@@ -1,14 +1,15 @@
-import 'dart:ffi';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-// import 'package:untitled3/DatabaseHelper01.dart';
 import 'package:untitled3/DatabaseHelper02.dart';
 import 'package:untitled3/pages/account_manage.dart';
 import 'package:untitled3/pages/my_favorite.dart';
 import 'package:untitled3/pages/password_manage.dart';
 
 class PasswordPage extends StatefulWidget {
+  final String nm,br;
+  PasswordPage({Key? key,required this.nm,required this.br});
+
   @override
   MyState createState() => MyState();
 }
@@ -50,8 +51,8 @@ class MyState extends State<PasswordPage> {
         child: ListView(
           children: <Widget>[
             UserAccountsDrawerHeader(
-                accountName: const Text("kenhuang0401"),
-                accountEmail: const Text("hello world!"),
+                accountName: Text("${widget.nm}"),
+                accountEmail: Text("${widget.br}"),
                 decoration: BoxDecoration(
                   color: Colors.grey,
                 ),
@@ -174,7 +175,6 @@ class MyState extends State<PasswordPage> {
                       ));
 
                       print(lst.join());
-                      List<Item> tmp = await _dbHelper02.getAllItem();
 
                       showSnackBar(context, '密碼新增成功', Colors.green);
                       Navigator.pop(context);
