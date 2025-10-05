@@ -364,7 +364,8 @@ class SigninPage extends StatelessWidget {
                     var color = Colors.green;
 
                     if(!(txt03.text.length > 10 && txt03.text.substring(txt03.text.length-10,txt03.text.length) == "@gmail.com")){
-                      showSnackBar(context, "帳號格式錯誤", Colors.red);
+                      str = "帳號格式錯誤";
+                      color = Colors.red;
                     }
                     else if(txt01.text != "" && txt02.text != "" && txt04.text != "") {
                       await _dbHelper.insertUser(User(
